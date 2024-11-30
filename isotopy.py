@@ -45,7 +45,10 @@ def animate_move_to(
 ) -> list[Mobject]:
     animations = []
     for source, target in pairs:
-        animations.append(entries[source][1:].animate.move_to(entries[target][1:]))
+        from_entries = entries[source][1:]
+        to_entries = entries[target][1:]
+        animation = from_entries.animate.move_to(to_entries)
+        animations.append(animation)
     return animations
 
 
@@ -70,6 +73,10 @@ def animate_pre_swap(
             )
         )
     return animations
+
+
+def indicate_tables(tables: list[Table]):
+    return [Indicate(table.get_entries_without_labels()) for table in tables]
 
 
 def show_heat_map(
@@ -234,6 +241,10 @@ class Isotopy(Scene):
         self.play(FadeTransform(e5, w5_copy), run_time=3)
         self.wait()
 
+        indicate_animations = indicate_tables([w5, w5_copy])
+        self.play(indicate_animations)
+        self.wait(2)
+
 
 class PrincipalIsotopy(Scene):
     def construct(self):
@@ -284,8 +295,8 @@ class PrincipalIsotopy(Scene):
 
         rows_animations = animate_move_to(e5.get_rows(), row_swaps)
         rows_animations.append(e5.top_left_entry.animate.flip(axis=[1, 0, 0]))
-        self.play(rows_animations)
-        self.wait()
+        self.play(rows_animations, run_time=2)
+        self.wait(2)
 
         col_swaps = [(2, 3), (3, 5), (4, 2), (5, 4)]
         pre_col_swap_animations = animate_pre_swap(e5, col_swaps, is_rows=False)
@@ -294,10 +305,14 @@ class PrincipalIsotopy(Scene):
 
         cols_animations = animate_move_to(e5.get_columns(), col_swaps)
         cols_animations.append(e5.top_left_entry.animate.flip())
-        self.play(cols_animations)
+        self.play(cols_animations, run_time=2)
+        self.wait(1)
+
+        indicate_animations = indicate_tables([e5, w5])
+        self.play(indicate_animations)
         self.wait(3)
 
         heat_map_animations = show_heat_map(e5_copy, row_swaps, col_swaps)
         self.play(Transform(e5, e5_copy))
         self.play(heat_map_animations)
-        self.wait()
+        self.wait(2)
