@@ -125,4 +125,4 @@ class Ward5(Scene):
         self.wait()
 
         self.play(Write(d10.get_row_labels()))
-        self.wait()
+        self.wait(3)
